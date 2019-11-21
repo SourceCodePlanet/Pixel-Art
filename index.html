@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <meta charset="utf-8">
+  <title>Pixel Art</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      user-select: none;
+    }
+    td {
+      border: 1px solid #aaa;
+      width: 10px;
+      height: 10px;
+    }
+    table {
+      margin-top: 10px;
+      border-collapse: collapse;
+      box-shadow: 1px 1px 3px #333;
+      border-radius: 3px;
+      overflow: hidden;
+      background-image: url(transparent.png);
+      background-size: 10px 10px;
+    }
+    #tools {
+      background-color: lightgreen;
+      font: bold 16px sans-serif;
+      box-shadow: 1px 1px 3px black;
+      border-radius: 5px;
+      padding: 10px;
+      color: white;
+      text-align: center;
+    }
+    #pixel-art {
+      width: 400px;
+    }
+    [type=number] {
+      border: none;
+      color: blue;
+      background-color: yellow;
+      width: 30px;
+      text-align: center;
+      font-family: calibri;
+      border-radius: 3px;
+    }
+    [type=number]::-webkit-inner-spin-button,
+    [type=number]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+    }
+    [type=color] {
+      border: none;
+      margin: 0;
+      background-color: transparent;
+      width: 30px;
+      height: 26px;
+      position: relative;
+      top: 4px;
+    }
+    [type=checkbox] {
+      -webkit-appearance: none;
+    }
+    #checkbox-label {
+      width: 30px;
+      height: 20px;
+      display: inline-block;
+      background-color: #aaa;
+      position: relative;
+      top: 5px;
+      left: -10px;
+      border-radius: 15px;
+    }
+    #checkbox-label::after {
+      content: "";
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: inline-block;
+      position: absolute;
+      top: 0;
+      left: 0;
+      box-shadow: 1px 1px 2px black;
+      background-color: white;
+    }
+    #grid:checked + #checkbox-label::after {
+      left: 10px;
+    }
+    #grid:checked + #checkbox-label {
+      background-color: blue;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="pixel-art">
+    <div id="tools">
+      <label>Width</label>
+      <label></label>
+      <input id="width" type="number" min="2" max="40" value="40">
+      <label>Height</label>
+      <input id="height" type="number" min="2" max="40" value="40">
+      <label>Color</label>
+      <input type="color">
+      <label>Grid</label>
+      <input id="grid" type="checkbox" checked>
+      <label id="checkbox-label" for="grid"></label>
+    </div>
+    <table></table>
+  </div>
+
+  <script>
+    var table = document.querySelector("table"),
+      tableWidth = document.querySelector("#width"),
+      tableHeight = document.querySelector("#height"),
+      color = document.querySelector("[type='color']"),
+      grid = document.querySelector("[type='checkbox']"),
+      isDragging, isErasing;
+
+    (tableWidth.onchange = tableHeight.onchange = function() {
+      table.innerHTML = ("<tr>" + "<td></td>".repeat(tableWidth.value) + "</tr>").repeat(tableHeight.value);
+      handelGrid();
+    })();
+
+    table.onmousedown = function(e) {
+      if(e.target.nodeName === "TD") {
+        isDragging = true;
+        if(e.button === 0) {
+          e.target.style.backgroundColor = color.value;
+        }else if(e.button === 2) {
+          e.target.style.backgroundColor = "transparent";
+          isErasing = true;
+        }
+      }
+    };
+
+    table.onmousemove = function(e) {
+      if(e.target.nodeName === "TD" && isDragging) {
+        e.target.style.backgroundColor = isErasing ? "transparent" : color.value;
+      }
+    };
+
+    window.onmouseup = function() {
+      isDragging = isErasing = false;
+    }
+
+    table.ondragstart = function(e) {
+      e.preventDefault();
+    }
+
+    table.oncontextmenu = function(e) {
+      e.preventDefault();
+    };
+
+    function handelGrid() {
+      document.querySelectorAll("td").forEach(function(e) {
+        if(grid.checked) {
+          e.style.border = "1px solid #aaa";
+        }else {
+          e.style.border = "none";
+        }
+      });
+    }
+
+    grid.onchange = handelGrid;
+  </script>
+
+</body>
+</html>
